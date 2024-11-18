@@ -8,8 +8,10 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write
 
     steps:
     - name: Checkout
@@ -24,5 +26,9 @@ jobs:
       run: dotnet build --no-restore
     - name: Generate autograding.json
       run: dotnet run --project ./.github/classroom/GenerateAutograding -- -e ClassroomTemplate -p 5 -o ./.github/classroom/autograding.json
+      env:
+        GITHUB_TOKEN: ${{ secrets.CLASSROOM_PAT }}
     - name: Autograding
       uses: education/autograding@v1
+      with:
+        token: ${{ secrets.CLASSROOM_PAT }}
