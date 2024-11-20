@@ -1,17 +1,17 @@
-name: grader
+name: Autograder
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  - push
+  - workflow_dispatch
+  - repository_dispatch
+permissions:
+  checks: write
+  actions: read
+  contents: read
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    
-    permissions:
-      contents: write
 
     steps:
     - name: Checkout
@@ -29,6 +29,6 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.CLASSROOM_PAT }}
     - name: Autograding
-      uses: education/autograding@v1
+      uses: classroom-resources/autograding@v1
       with:
         token: ${{ secrets.CLASSROOM_PAT }}
