@@ -51,7 +51,7 @@ public class BankAccountTests
     public void ConcurrentOperations_ShouldBeThreadSafe()
     {
         // Arrange
-        var account = new BankAccount(1000);
+        var account = new BankAccount(10000000);
         var threads = new Thread[2];
 
         threads[0] = new Thread(() =>
@@ -81,6 +81,6 @@ public class BankAccountTests
         }
 
         // Assert
-        Assert.Equal(1000, account.GetBalance());
+        Assert.Equal(10000000, account.GetBalance());
     }
 }
