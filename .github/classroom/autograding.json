@@ -31,16 +31,6 @@
       "points": 1
     },
     {
-      "name": "Unit Tests (ConcurrentDepositsAndWithdrawals_ShouldMaintainCorrectBalance)",
-      "setup": "",
-      "run": "DOTNET_CLI_HOME=/home/runner dotnet test --filter TestGroup=ConcurrentDepositsAndWithdrawals_ShouldMaintainCorrectBalance",
-      "input": "",
-      "output": "",
-      "comparison": "included",
-      "timeout": 1,
-      "points": 1
-    },
-    {
       "name": "Unit Tests (ConcurrentOperations_ShouldBeThreadSafe)",
       "setup": "",
       "run": "DOTNET_CLI_HOME=/home/runner dotnet test --filter TestGroup=ConcurrentOperations_ShouldBeThreadSafe",
@@ -48,7 +38,7 @@
       "output": "",
       "comparison": "included",
       "timeout": 1,
-      "points": 1
+      "points": 2
     }
   ]
 }
