@@ -20,13 +20,9 @@ internal sealed class TestSet
         {
             Points = 1
         },
-        new DotnetTestGroup("ConcurrentDepositsAndWithdrawals_ShouldMaintainCorrectBalance")
-        {
-            Points = 1
-        },
         new DotnetTestGroup("ConcurrentOperations_ShouldBeThreadSafe")
         {
-            Points = 1
+            Points = 2
         },
     };
 }

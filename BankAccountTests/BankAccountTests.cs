@@ -47,48 +47,28 @@ public class BankAccountTests
     }
 
     [Fact]
-    [Trait("TestGroup", "ConcurrentDepositsAndWithdrawals_ShouldMaintainCorrectBalance")]
-    public void ConcurrentDepositsAndWithdrawals_ShouldMaintainCorrectBalance()
-    {
-        // Arrange
-        var account = new BankAccount(1000);
-        var threads = new Thread[10];
-
-        // Act
-        for (int i = 0; i < 5; i++)
-        {
-            threads[i] = new Thread(() => account.Deposit(100));
-            threads[i + 5] = new Thread(() => account.Withdraw(50));
-        }
-
-        foreach (var thread in threads)
-        {
-            thread.Start();
-        }
-
-        foreach (var thread in threads)
-        {
-            thread.Join();
-        }
-
-        // Assert
-        Assert.Equal(1250, account.GetBalance());
-    }
-
-    [Fact]
     [Trait("TestGroup", "ConcurrentOperations_ShouldBeThreadSafe")]
     public void ConcurrentOperations_ShouldBeThreadSafe()
     {
         // Arrange
         var account = new BankAccount(1000);
-        var threads = new Thread[100];
+        var threads = new Thread[2];
 
-        // Act
-        for (int i = 0; i < 50; i++)
+        threads[0] = new Thread(() =>
         {
-            threads[i] = new Thread(() => account.Deposit(10));
-            threads[i + 50] = new Thread(() => account.Withdraw(10));
-        }
+            for (int j = 0; j < 1000000; j++)
+            {
+                account.Deposit(10);
+            }
+        });
+        threads[1] = new Thread(() =>
+        {
+            for (int j = 0; j < 1000000; j++)
+            {
+                account.Withdraw(10);
+            }
+        });
+
 
         foreach (var thread in threads)
         {
