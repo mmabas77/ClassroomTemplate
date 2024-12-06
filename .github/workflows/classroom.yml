@@ -1,34 +1,77 @@
-name: Autograder
+name: Autograding Tests
 
 on:
   - push
   - workflow_dispatch
   - repository_dispatch
+
 permissions:
   checks: write
   actions: read
   contents: read
 
 jobs:
-  build:
+  run-autograding-tests:
     runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 8.0.x
-    - name: Restore dependencies
-      run: dotnet restore
-    - name: Build
-      run: dotnet build --no-restore
-    - name: Generate autograding.json
-      run: dotnet run --project ./.github/classroom/GenerateAutograding -- -e ClassroomTemplate -p 5 -o ./.github/classroom/autograding.json
-      env:
-        GITHUB_TOKEN: ${{ secrets.CLASSROOM_PAT }}
-    - name: Autograding
-      uses: classroom-resources/autograding@v1
-      with:
-        token: ${{ secrets.CLASSROOM_PAT }}
+      # Checkout the code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Unit Test: Deposit_ShouldIncreaseBalance
+      - name: test_deposit_should_increase_balance
+        id: test_deposit_should_increase_balance
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: test_deposit_should_increase_balance
+          setup-command: ""
+          command: "DOTNET_CLI_HOME=/home/runner dotnet test --filter TestGroup=Deposit_ShouldIncreaseBalance"
+          timeout: 1
+          max-score: 1
+
+      # Unit Test: Withdraw_ShouldDecreaseBalance_WhenSufficientFunds
+      - name: test_withdraw_should_decrease_balance
+        id: test_withdraw_should_decrease_balance
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: test_withdraw_should_decrease_balance
+          setup-command: ""
+          command: "DOTNET_CLI_HOME=/home/runner dotnet test --filter TestGroup=Withdraw_ShouldDecreaseBalance_WhenSufficientFunds"
+          timeout: 1
+          max-score: 1
+
+      # Unit Test: Withdraw_ShouldNotAllowOverdraft
+      - name: test_withdraw_should_not_allow_overdraft
+        id: test_withdraw_should_not_allow_overdraft
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: test_withdraw_should_not_allow_overdraft
+          setup-command: ""
+          command: "DOTNET_CLI_HOME=/home/runner dotnet test --filter TestGroup=Withdraw_ShouldNotAllowOverdraft"
+          timeout: 1
+          max-score: 1
+
+      # Unit Test: ConcurrentOperations_ShouldBeThreadSafe
+      - name: test_concurrent_operations_should_be_thread_safe
+        id: test_concurrent_operations_should_be_thread_safe
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: test_concurrent_operations_should_be_thread_safe
+          setup-command: ""
+          command: "DOTNET_CLI_HOME=/home/runner dotnet test --filter TestGroup=ConcurrentOperations_ShouldBeThreadSafe"
+          timeout: 1
+          max-score: 2
+
+      # Autograding Reporter with multiple tests
+      - name: Autograding Reporter
+        uses: classroom-resources/autograding-grading-reporter@v1
+        env:
+          TEST_DEPOSIT_SHOULD_INCREASE_BALANCE_RESULTS: "${{ steps.test_deposit_should_increase_balance.outputs.result }}"
+          TEST_WITHDRAW_SHOULD_DECREASE_BALANCE_RESULTS: "${{ steps.test_withdraw_should_decrease_balance.outputs.result }}"
+          TEST_WITHDRAW_SHOULD_NOT_ALLOW_OVERDRAFT_RESULTS: "${{ steps.test_withdraw_should_not_allow_overdraft.outputs.result }}"
+          TEST_CONCURRENT_OPERATIONS_SHOULD_BE_THREAD_SAFE_RESULTS: "${{ steps.test_concurrent_operations_should_be_thread_safe.outputs.result }}"
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          runners: test_deposit_should_increase_balance,test_withdraw_should_decrease_balance,test_withdraw_should_not_allow_overdraft,test_concurrent_operations_should_be_thread_safe
